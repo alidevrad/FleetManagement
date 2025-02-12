@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FleetManagement.Application\FleetManagement.Application.csproj" />
+    <ProjectReference Include="..\FleetManagement.Domain\FleetManagement.Domain.csproj" />
+    <ProjectReference Include="..\FleetManagement.Infrastructure\FleetManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\FleetManagement.Persistence.EF\FleetManagement.Persistence.EF.csproj" />
+  </ItemGroup>
+
+</Project>
