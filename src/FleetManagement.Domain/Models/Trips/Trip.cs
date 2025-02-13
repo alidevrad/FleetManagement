@@ -26,7 +26,7 @@ public class Trip : AuditableAggregateRoot<long>
     public double TotalFuelConsumption { get; private set; }
 
     //TODO: Implement a sequence for version
-    public long Version { get; private set; }
+    public Guid Version { get; private set; }
 
     private readonly List<SubTrip> _subTrips = new();
     public IReadOnlyList<SubTrip> SubTrips => _subTrips.AsReadOnly();
@@ -49,7 +49,7 @@ public class Trip : AuditableAggregateRoot<long>
         DriverId = driverId;
         VehicleId = vehicleId;
         _destinations = destinations;
-        Version = Guid.NewGuid();
+        //TODO: Version = Guid.NewGuid();
         Status = TripStatus.Scheduled;
     }
 
