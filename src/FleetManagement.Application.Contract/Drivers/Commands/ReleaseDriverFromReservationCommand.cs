@@ -2,4 +2,4 @@
 
 namespace FleetManagement.Application.Contract.Drivers.Commands;
 
-public record ReleaseDriverCommand(long Id) : ICommand;
+public record ReleaseDriverFromReservationCommand(long Id, long ReservationId) : ICommand;

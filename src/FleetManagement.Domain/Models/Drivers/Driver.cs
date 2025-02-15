@@ -2,6 +2,7 @@
 using FleetManagement.Domain.Common.BuildingBlocks.Core;
 using FleetManagement.Domain.Models.Drivers.Enums;
 using FleetManagement.Domain.Models.Drivers.Events;
+using FleetManagement.Domain.Models.Shared;
 
 namespace FleetManagement.Domain.Models.Drivers;
 
@@ -26,7 +27,9 @@ public class Driver : AuditableAggregateRoot<long>
     private readonly List<EmergencyContact> _emergencyContacts = new();
     public IReadOnlyList<EmergencyContact> EmergencyContacts => _emergencyContacts.AsReadOnly();
 
-    public bool IsAvailable { get; private set; }
+    private readonly List<ReservationPeriod> _reservationPeriods = new();
+    public IReadOnlyList<ReservationPeriod> ReservationPeriods => _reservationPeriods.AsReadOnly();
+
     public bool IsActive { get; private set; }
 
     #endregion
@@ -59,7 +62,6 @@ public class Driver : AuditableAggregateRoot<long>
         LicenseType = licenseType;
         LicenseIssueDate = licenseIssueDate;
         LicenseExpirationDate = licenseExpirationDate;
-        IsAvailable = true;
         IsActive = true;
         NativeLanguage = nativeLanguage;
     }
@@ -68,24 +70,47 @@ public class Driver : AuditableAggregateRoot<long>
 
     #region Methods
 
-    //TODO: Should reserve in a range time
-    public void Reserve()
+    public bool IsAvailableForPeriod(DateTime start, DateTime end)
     {
-        if (!IsAvailable)
-            throw new InvalidOperationException("Driver is already reserved or unavailable.");
-
-        IsAvailable = false;
-        AddDomainEvent(new DriverReserved(BusinessId, Id));
+        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && r.Overlaps(start, end));
     }
 
-    public void Release()
+    public bool IsCurrentlyAvailable()
     {
-        if (IsAvailable)
-            throw new InvalidOperationException("Driver is already available.");
-
-        IsAvailable = true;
-        AddDomainEvent(new DriverReleased(BusinessId, Id));
+        var now = DateTime.UtcNow;
+        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && now >= r.Start && now < r.End);
     }
+
+    public void Reserve(DateTime start, DateTime end)
+    {
+        if (!IsAvailableForPeriod(start, end))
+            throw new InvalidOperationException("The selected time period overlaps with an existing reservation.");
+
+        var reservation = new ReservationPeriod(start, end);
+        _reservationPeriods.Add(reservation);
+    }
+
+    public void Release(long reservationId)
+    {
+        var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
+        if (reservation == null)
+            throw new InvalidOperationException("Reservation not found.");
+
+        if (reservation.Status == ReservationStatus.Cancelled)
+            throw new InvalidOperationException("Reservation is already cancelled.");
+
+        reservation.Cancel();
+    }
+
+    public void CompleteReservation(long reservationId)
+    {
+        var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
+        if (reservation == null)
+            throw new InvalidOperationException("Reservation not found.");
+
+        reservation.Finish();
+    }
+
     public void Activate()
     {
         if (IsActive)

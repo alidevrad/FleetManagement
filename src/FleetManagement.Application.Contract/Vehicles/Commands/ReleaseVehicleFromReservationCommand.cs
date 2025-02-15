@@ -2,4 +2,4 @@
 
 namespace FleetManagement.Application.Contract.Vehicles.Commands;
 
-public record ReleaseVehicleCommand(long Id) : ICommand;
+public record ReleaseVehicleFromReservationCommand(long Id, long ReservationId) : ICommand;

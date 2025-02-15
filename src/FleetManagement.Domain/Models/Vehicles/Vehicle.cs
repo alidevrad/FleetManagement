@@ -1,4 +1,5 @@
 ﻿using FleetManagement.Domain.Common.BuildingBlocks.Core;
+using FleetManagement.Domain.Models.Shared;
 using FleetManagement.Domain.Models.Vehicles.Events;
 
 namespace FleetManagement.Domain.Models.Vehicles;
@@ -12,10 +13,12 @@ public class Vehicle : AuditableAggregateRoot<long>
     public string LicensePlateNumber { get; private set; }
     public int ModelYear { get; private set; }
     public string Color { get; private set; }
-    public bool IsAvailable { get; private set; }
 
     private readonly List<VehicleMaintenance> _vehicleMaintenances = new();
     public IReadOnlyList<VehicleMaintenance> VehicleMaintenances => _vehicleMaintenances.AsReadOnly();
+
+    private readonly List<ReservationPeriod> _reservationPeriods = new();
+    public IReadOnlyList<ReservationPeriod> ReservationPeriods => _reservationPeriods.AsReadOnly();
 
     #endregion
 
@@ -37,29 +40,42 @@ public class Vehicle : AuditableAggregateRoot<long>
         LicensePlateNumber = licensePlateNumber;
         ModelYear = modelYear;
         Color = color;
-        IsAvailable = true;
     }
 
     #endregion
 
     #region Methods
 
-    public void Reserve()
+    public bool IsAvailableForPeriod(DateTime start, DateTime end)
     {
-        if (!IsAvailable)
-            throw new InvalidOperationException("Vehicle is already reserved or unavailable.");
-
-        IsAvailable = false;
-        AddDomainEvent(new VehicleReserved(BusinessId, Id, LicensePlateNumber));
+        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && r.Overlaps(start, end));
     }
 
-    public void Release()
+    public bool IsCurrentlyAvailable()
     {
-        if (IsAvailable)
-            throw new InvalidOperationException("Vehicle is already available.");
+        var now = DateTime.UtcNow;
+        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && now >= r.Start && now < r.End);
+    }
 
-        IsAvailable = true;
-        AddDomainEvent(new VehicleReleased(BusinessId, Id, LicensePlateNumber));
+    public void Reserve(DateTime start, DateTime end)
+    {
+        if (!IsAvailableForPeriod(start, end))
+            throw new InvalidOperationException("The selected time period overlaps with an existing reservation.");
+
+        var reservation = new ReservationPeriod(start, end);
+        _reservationPeriods.Add(reservation);
+    }
+
+    public void Release(long reservationId)
+    {
+        var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
+        if (reservation == null)
+            throw new InvalidOperationException("Reservation not found.");
+
+        if (reservation.Status == ReservationStatus.Cancelled)
+            throw new InvalidOperationException("Reservation is already cancelled.");
+
+        reservation.Cancel();
     }
 
     public void AddMaintenanceRecord(string reason, DateTime repairDate)

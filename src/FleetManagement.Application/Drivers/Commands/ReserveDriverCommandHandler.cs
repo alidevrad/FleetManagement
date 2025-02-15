@@ -25,9 +25,10 @@ public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand>
             throw new KeyNotFoundException("Driver not found.");
         }
 
-        driver.Reserve();
+        driver.Reserve(request.Start, request.End);
 
         _driverRepository.Update(driver);
         await _driverRepository.SaveChangesAsync();
     }
 }
+

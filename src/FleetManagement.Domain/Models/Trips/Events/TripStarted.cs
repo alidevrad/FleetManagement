@@ -2,15 +2,8 @@
 
 namespace FleetManagement.Domain.Models.Trips.Events;
 
-public class TripStarted : DomainEvent
+public class TripStarted(Guid BusinessId, long TripId) : DomainEvent(aggregateType: "Trip", businessId: BusinessId)
 {
-    public long TripId { get; }
-    public DateTime StartedAt { get; }
-
-    public TripStarted(Guid businessId, long tripId)
-        : base(aggregateType: "Trip", businessId: businessId)
-    {
-        TripId = tripId;
-        StartedAt = DateTime.UtcNow;
-    }
-}
+    public DateTime StartedAt { get; } = DateTime.UtcNow;
+    public long TripId { get; } = TripId;
+};

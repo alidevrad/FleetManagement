@@ -1,9 +1,11 @@
-﻿using FleetManagement.Domain.Models.Vehicles;
+﻿using FleetManagement.Domain.Models.Shared;
+using FleetManagement.Domain.Models.Vehicles;
 using FleetManagement.Domain.Models.VehicleTypes;
 using FleetManagement.Persistence.EF.Common;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FleetManagement.Persistence.EF.Mappings.Vehicles;
 
@@ -27,9 +29,6 @@ public class VehicleConfiguration : AuditableAggregateRootConfiguration<Vehicle,
         builder.Property(v => v.Color)
                .IsRequired()
                .HasMaxLength(50);
-
-        builder.Property(v => v.IsAvailable)
-               .IsRequired();
 
         builder.HasOne<VehicleType>()
                .WithMany()
@@ -58,5 +57,34 @@ public class VehicleConfiguration : AuditableAggregateRootConfiguration<Vehicle,
             map.UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
+        builder.OwnsMany(d => d.ReservationPeriods, reservation =>
+        {
+            reservation.ToTable("VehicleReservationPeriods");
+
+            reservation.WithOwner().HasForeignKey("DriverId");
+
+            reservation.Property(r => r.Start)
+                .IsRequired()
+                .HasColumnType("datetime2");
+
+            reservation.Property(r => r.End)
+                .IsRequired()
+                .HasColumnType("datetime2");
+
+            reservation.Property(r => r.Status)
+                .IsRequired()
+                .HasConversion(new EnumToNumberConverter<ReservationStatus, byte>());
+
+            reservation.Property(r => r.ActivatedAt)
+                .HasColumnType("datetime2");
+
+            reservation.Property(r => r.CanceledAt)
+                .HasColumnType("datetime2");
+
+            reservation.Property(r => r.FinishedAt)
+                .HasColumnType("datetime2");
+
+            reservation.UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
     }
 }

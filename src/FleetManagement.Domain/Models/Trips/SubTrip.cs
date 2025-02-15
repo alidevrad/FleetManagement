@@ -5,36 +5,19 @@ namespace FleetManagement.Domain.Models.Trips;
 
 public class SubTrip : AuditableEntity<long>
 {
-    #region Properties
-
     public long TripId { get; private set; }
-    public string Origin { get; private set; }
-    public string Destination { get; private set; }
-    public string RouteDetails { get; private set; }
-
-    //TODO: بررسی کن که تایم اسپن خوبه یا دابل ؟ که بتونی راحت تر جمع کنی
-    public TimeSpan EstimatedDuration { get; private set; }
-
-    public DateTime? EndTime { get; private set; }
-    public SubTripStatus Status { get; private set; }
-    public double FuelConsumption { get; private set; }
-    public double DelayTimeValue { get; private set; }
-
-    //TODO: SubTrip should have twi side - request and response
-    //Check implementation for this structure ☝
-    #endregion
-
-    #region Constructors
+    public string Origin { get; private set; }                // For example, a pickup address
+    public string Destination { get; private set; }           // For example, branch address
+    public string RouteDetails { get; private set; }          // JSON or text details from Google Maps API
+    public TimeSpan EstimatedDuration { get; private set; }   // Estimated travel time
+    public DateTime? EndTime { get; private set; }              // Actual completion time
+    public SubTripStatus Status { get; private set; }           // Pending, InProgress, Completed, Canceled
+    public double FuelConsumption { get; private set; }         // Fuel consumed during this leg
+    public double DelayTimeValue { get; private set; }          // Unloading delay (in minutes)
 
     protected SubTrip() { }
 
-    public SubTrip(long tripId,
-                   string origin,
-                   string destination,
-                   string routeDetails,
-                   TimeSpan estimatedDuration,
-                   double fuelConsumption,
-                   double delayTimeValue = 0)
+    public SubTrip(long tripId, string origin, string destination, string routeDetails, TimeSpan estimatedDuration, double fuelConsumption, double delayTimeValue = 0)
     {
         TripId = tripId;
         Origin = origin;
@@ -42,19 +25,14 @@ public class SubTrip : AuditableEntity<long>
         RouteDetails = routeDetails;
         EstimatedDuration = estimatedDuration;
         FuelConsumption = fuelConsumption;
-        Status = SubTripStatus.Pending;
         DelayTimeValue = delayTimeValue;
+        Status = SubTripStatus.Pending;
     }
-
-    #endregion
-
-    #region Methods
 
     public void MarkInProgress()
     {
         if (Status != SubTripStatus.Pending)
             throw new InvalidOperationException("SubTrip must be in pending status to start.");
-
         Status = SubTripStatus.InProgress;
     }
 
@@ -62,7 +40,6 @@ public class SubTrip : AuditableEntity<long>
     {
         if (Status != SubTripStatus.InProgress)
             throw new InvalidOperationException("SubTrip must be in progress to complete.");
-
         Status = SubTripStatus.Completed;
         EndTime = DateTime.UtcNow;
     }
@@ -71,7 +48,6 @@ public class SubTrip : AuditableEntity<long>
     {
         if (Status == SubTripStatus.Completed)
             throw new InvalidOperationException("Completed sub-trips cannot be canceled.");
-
         Status = SubTripStatus.Canceled;
     }
 
@@ -79,6 +55,4 @@ public class SubTrip : AuditableEntity<long>
     {
         DelayTimeValue = delayValue;
     }
-
-    #endregion
 }

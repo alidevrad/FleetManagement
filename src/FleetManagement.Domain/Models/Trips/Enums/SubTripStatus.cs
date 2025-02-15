@@ -1,10 +1,9 @@
-﻿namespace FleetManagement.Domain.Models.Trips.Enums
+﻿namespace FleetManagement.Domain.Models.Trips.Enums;
+
+public enum SubTripStatus
 {
-    public enum SubTripStatus
-    {
-        Pending,
-        InProgress,
-        Completed,
-        Canceled
-    }
+    Pending,
+    InProgress,
+    Completed,
+    Canceled
 }

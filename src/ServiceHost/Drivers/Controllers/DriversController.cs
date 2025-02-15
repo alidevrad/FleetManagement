@@ -55,16 +55,22 @@ public class DriversController : ControllerBase
     }
 
     [HttpPost("{id}/reserve")]
-    public async Task<IActionResult> Reserve(long id)
+    public async Task<IActionResult> Reserve(long id, [FromBody] ReserveDriverCommand command)
     {
-        await _mediator.Send(new ReserveDriverCommand(id));
+        if (id != command.Id)
+            return BadRequest("Mismatched driver ID");
+
+        await _mediator.Send(command);
         return NoContent();
     }
 
     [HttpPost("{id}/release")]
-    public async Task<IActionResult> Release(long id)
+    public async Task<IActionResult> Release(long id, [FromBody] ReleaseDriverFromReservationCommand command)
     {
-        await _mediator.Send(new ReleaseDriverCommand(id));
+        if (id != command.Id)
+            return BadRequest("Mismatched driver ID");
+
+        await _mediator.Send(command);
         return NoContent();
     }
 

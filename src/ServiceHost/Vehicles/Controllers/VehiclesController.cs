@@ -41,16 +41,22 @@ public class VehiclesController : ControllerBase
     }
 
     [HttpPost("{id}/reserve")]
-    public async Task<IActionResult> Reserve(long id)
+    public async Task<IActionResult> Reserve(long id, [FromBody] ReserveVehicleCommand command)
     {
-        await _mediator.Send(new ReserveVehicleCommand(id));
+        if (id != command.Id)
+            return BadRequest("Mismatched vehicle ID");
+
+        await _mediator.Send(command);
         return NoContent();
     }
 
     [HttpPost("{id}/release")]
-    public async Task<IActionResult> Release(long id)
+    public async Task<IActionResult> Release(long id, [FromBody] ReleaseVehicleFromReservationCommand command)
     {
-        await _mediator.Send(new ReleaseVehicleCommand(id));
+        if (id != command.Id)
+            return BadRequest("Mismatched vehicle ID");
+
+        await _mediator.Send(command);
         return NoContent();
     }
 

@@ -2,17 +2,10 @@
 
 namespace FleetManagement.Domain.Models.Trips.Events;
 
-public class TripDriverAssigned : DomainEvent
+public class TripDriverAssigned(Guid BusinessId, long TripId, long DriverId)
+    : DomainEvent(aggregateType: "Trip", businessId: BusinessId)
 {
-    public long TripId { get; }
-    public long DriverId { get; }
-    public DateTime AssignedAt { get; }
-
-    public TripDriverAssigned(Guid businessId, long tripId, long driverId)
-        : base(aggregateType: "Trip", businessId: businessId)
-    {
-        TripId = tripId;
-        DriverId = driverId;
-        AssignedAt = DateTime.UtcNow;
-    }
-}
+    public DateTime AssignedAt { get; } = DateTime.UtcNow;
+    public long TripId { get; } = TripId;
+    public long DriverId { get; } = DriverId;
+};

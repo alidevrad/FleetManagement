@@ -2,17 +2,9 @@
 
 namespace FleetManagement.Domain.Models.Trips.Events;
 
-public class SubTripAdded : DomainEvent
+public class SubTripAdded(Guid BusinessId, long TripId, long SubTripId) : DomainEvent(aggregateType: "Trip", businessId: BusinessId)
 {
-    public long TripId { get; }
-    public long SubTripId { get; }
-    public DateTime AddedAt { get; }
-
-    public SubTripAdded(Guid businessId, long tripId, long subTripId)
-        : base(aggregateType: "Trip", businessId: businessId)
-    {
-        TripId = tripId;
-        SubTripId = subTripId;
-        AddedAt = DateTime.UtcNow;
-    }
-}
+    public DateTime AddedAt { get; } = DateTime.UtcNow;
+    public long TripId { get; } = TripId;
+    public long SubTripId { get; } = SubTripId;
+};

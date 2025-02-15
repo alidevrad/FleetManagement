@@ -21,6 +21,7 @@ public class DeactivateDriverCommandHandler : IRequestHandler<DeactivateDriverCo
         var driver = await _queryRepository.GetByIdAsync(request.Id);
         if (driver == null)
         {
+            //TODO: Write suitable exception instead of KeyNotFoundException
             throw new KeyNotFoundException("Driver not found");
         }
 

@@ -2,4 +2,4 @@
 
 namespace FleetManagement.Application.Contract.Vehicles.Commands;
 
-public record ReserveVehicleCommand(long Id) : ICommand;
+public record ReserveVehicleCommand(long Id, DateTime Start, DateTime End) : ICommand;

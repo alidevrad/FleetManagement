@@ -23,8 +23,9 @@ public class ReserveVehicleCommandHandler : IRequestHandler<ReserveVehicleComman
         if (vehicle == null)
             throw new KeyNotFoundException("Vehicle not found.");
 
-        vehicle.Reserve();
+        vehicle.Reserve(request.Start, request.End);
         _vehicleRepository.Update(vehicle);
+
         await _vehicleRepository.SaveChangesAsync();
     }
 }
