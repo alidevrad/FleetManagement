@@ -26,101 +26,100 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, long>
 
     public async Task<long> Handle(CreateTripCommand request, CancellationToken cancellationToken)
     {
-        long driverReservationId = 0;
-        long vehicleReservationId = 0;
-
-        // 🚀 مرحله 1: محاسبه مسیر بهینه از Google API
-        var routeData = await _googleMapsService.CalculateShortestRouteAsync(request.SubTrips)
-                        ?? throw new Exception("Failed to calculate route.");
+        var routeData = await _googleMapsService.CalculateShortestRouteAsync(request.SubTrips);
+        if (routeData == null)
+            throw new Exception("Failed to calculate route.");
 
         var estimatedEndTime = routeData.EstimatedEndTime;
 
-        // 🚀 مرحله 2: قفل کردن راننده از طریق MediatR
-        var driverLocked = await _mediator.Send(new LockResourceCommand(request.DriverId,
-                                                                        typeof(Driver).Name,
-                                                                        request.StartDateTime,
-                                                                        estimatedEndTime), cancellationToken);
-        if (!driverLocked)
-            throw new Exception("Driver is not available.");
+        var (driverReservationId, vehicleReservationId) = await LockResources(request, estimatedEndTime, cancellationToken);
 
         try
         {
-            // 🚀 مرحله 3: قفل کردن وسیله نقلیه از طریق MediatR
-            var vehicleLocked = await _mediator.Send(new LockResourceCommand(request.VehicleId,
-                                                                             typeof(Vehicle).Name,
-                                                                             request.StartDateTime,
-                                                                             estimatedEndTime), cancellationToken);
-            if (!vehicleLocked)
-            {
-                await _mediator.Send(new RollbackResourceReservationCommand(request.DriverId, request.BusinessId), cancellationToken);
-                throw new Exception("Vehicle is not available.");
-            }
+            var trip = CreateTripAggregate(request);
+            await _tripRepository.AddAsync(trip);
+            await _tripRepository.SaveChangesAsync();
 
-            try
-            {
-                // ایجاد Aggregate Root سفر
-                var trip = new Trip(
-                    request.TripName,
-                    request.StartDateTime,
-                    request.DriverId,
-                    request.VehicleId,
-                    request.BusinessId
-                );
-
-                // پردازش هر SubTrip موجود در Command
-                foreach (var subTripCmd in request.SubTrips)
-                {
-                    var deliveryPoint = new DeliveryPoint(
-                        subTripCmd.DeliveryPoint.BranchId,
-                        subTripCmd.DeliveryPoint.Order,
-                        subTripCmd.DeliveryPoint.Address,
-                        subTripCmd.DeliveryPoint.Latitude,
-                        subTripCmd.DeliveryPoint.Longitude
-                    );
-
-                    var subTrip = new SubTrip(
-                        trip.Id,
-                        subTripCmd.Origin,
-                        deliveryPoint,
-                        subTripCmd.RouteDetails,
-                        subTripCmd.EstimatedDuration,
-                        subTripCmd.FuelConsumption,
-                        subTripCmd.DelayTimeValue
-                    );
-
-                    trip.AddSubTrip(subTrip);
-                }
-
-                trip.CalculateTotalDelayTime();
-                trip.CalculateTotalFuelConsumption();
-                trip.CalculateTotalTripDuration();
-
-                await _tripRepository.AddAsync(trip);
-                await _tripRepository.SaveChangesAsync();
-
-                driverReservationId = await _mediator.Send(new ReserveDriverCommand(request.DriverId, request.StartDateTime, estimatedEndTime));
-                vehicleReservationId = await _mediator.Send(new ReserveVehicleCommand(request.DriverId, request.StartDateTime, estimatedEndTime));
-
-                return trip.Id;
-
-                // return Result<long>.Success(trip.Id);
-            }
-            catch (Exception ex)
-            {
-                await _mediator.Send(new RollbackDriverReservationCommand(request.DriverId, driverReservationId), cancellationToken);
-                await _mediator.Send(new RollbackVehicleReservationCommand(request.VehicleId, vehicleReservationId), cancellationToken);
-
-                await _mediator.Send(new RollbackResourceReservationCommand(request.DriverId, request.BusinessId), cancellationToken);
-                await _mediator.Send(new RollbackResourceReservationCommand(request.VehicleId, request.BusinessId), cancellationToken);
-
-                throw;
-            }
+            (driverReservationId, vehicleReservationId) = await ReserveResources(request, estimatedEndTime, cancellationToken);
+            return trip.Id;
         }
         catch
         {
-            await _mediator.Send(new RollbackResourceReservationCommand(request.DriverId, request.BusinessId), cancellationToken);
+            await RollbackResources(request, driverReservationId, vehicleReservationId, cancellationToken);
             throw;
         }
     }
-}
 
+    private async Task<(long driverReservationId, long vehicleReservationId)> LockResources(CreateTripCommand request, DateTime estimatedEndTime, CancellationToken cancellationToken)
+    {
+        var driverLocked = await _mediator.Send(new LockResourceCommand(request.DriverId, typeof(Driver).Name, request.StartDateTime, estimatedEndTime), cancellationToken);
+        if (!driverLocked)
+            throw new Exception("Driver is not available.");
+
+        var vehicleLocked = await _mediator.Send(new LockResourceCommand(request.VehicleId, typeof(Vehicle).Name, request.StartDateTime, estimatedEndTime), cancellationToken);
+        if (!vehicleLocked)
+        {
+            await _mediator.Send(new RollbackResourceReservationCommand(request.DriverId, request.BusinessId), cancellationToken);
+            throw new Exception("Vehicle is not available.");
+        }
+
+        return (0, 0); // Reservation IDs are initially 0, they will be updated after reservation
+    }
+
+    private Trip CreateTripAggregate(CreateTripCommand request)
+    {
+        var trip = new Trip(request.TripName, request.StartDateTime, request.DriverId, request.VehicleId, request.BusinessId);
+
+        foreach (var subTripCmd in request.SubTrips)
+        {
+            var deliveryPoint = new DeliveryPoint(
+                subTripCmd.DeliveryPoint.BranchId,
+                subTripCmd.DeliveryPoint.Order,
+                subTripCmd.DeliveryPoint.Address,
+                subTripCmd.DeliveryPoint.Latitude,
+                subTripCmd.DeliveryPoint.Longitude
+            );
+
+            var subTrip = new SubTrip(
+                trip.Id,
+                subTripCmd.Origin,
+                deliveryPoint,
+                subTripCmd.RouteDetails,
+                subTripCmd.EstimatedDuration,
+                subTripCmd.FuelConsumption,
+                subTripCmd.DelayTimeValue
+            );
+
+            trip.AddSubTrip(subTrip);
+        }
+
+        trip.CalculateTotalDelayTime();
+        trip.CalculateTotalFuelConsumption();
+        trip.CalculateTotalTripDuration();
+
+        return trip;
+    }
+
+    private async Task<(long driverReservationId, long vehicleReservationId)> ReserveResources(CreateTripCommand request, DateTime estimatedEndTime, CancellationToken cancellationToken)
+    {
+        var driverReservationId = await _mediator.Send(new ReserveDriverCommand(request.DriverId, request.StartDateTime, estimatedEndTime));
+        var vehicleReservationId = await _mediator.Send(new ReserveVehicleCommand(request.VehicleId, request.StartDateTime, estimatedEndTime));
+
+        return (driverReservationId, vehicleReservationId);
+    }
+
+    private async Task RollbackResources(CreateTripCommand request, long driverReservationId, long vehicleReservationId, CancellationToken cancellationToken)
+    {
+        if (driverReservationId > 0)
+        {
+            await _mediator.Send(new RollbackDriverReservationCommand(request.DriverId, driverReservationId), cancellationToken);
+        }
+        if (vehicleReservationId > 0)
+        {
+            await _mediator.Send(new RollbackVehicleReservationCommand(request.VehicleId, vehicleReservationId), cancellationToken);
+        }
+
+        await _mediator.Send(new RollbackResourceReservationCommand(request.DriverId, request.BusinessId), cancellationToken);
+        await _mediator.Send(new RollbackResourceReservationCommand(request.VehicleId, request.BusinessId), cancellationToken);
+    }
+}
