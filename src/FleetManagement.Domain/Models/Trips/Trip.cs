@@ -18,10 +18,6 @@ public class Trip : AuditableAggregateRoot<long>
     public long DriverId { get; private set; }
     public long VehicleId { get; private set; }
 
-    // Instead of just a list of destination IDs, we use an ordered list of TripDestination.
-    private readonly List<TripDestination> _destinations = new();
-    public IReadOnlyList<TripDestination> Destinations => _destinations.AsReadOnly();
-
     public double TotalDelayTime { get; private set; }          // Sum of unloading delays (in minutes)
     public double TotalTripDuration { get; private set; }         // Google Maps API duration + TotalDelayTime (in minutes)
     public double TotalFuelConsumption { get; private set; }      // Total fuel consumption (liters, for example)
@@ -38,14 +34,18 @@ public class Trip : AuditableAggregateRoot<long>
 
     protected Trip() : base(Guid.NewGuid()) { }
 
-    public Trip(string tripName, DateTime startDateTime, long driverId, long vehicleId, List<TripDestination> destinations, Guid businessId)
+    public Trip(string tripName,
+                DateTime startDateTime,
+                long driverId,
+                long vehicleId,
+                Guid businessId)
         : base(businessId)
     {
         TripName = tripName;
         StartDateTime = startDateTime;
         DriverId = driverId;
         VehicleId = vehicleId;
-        _destinations = destinations ?? new List<TripDestination>();
+
         // Initialize version as V1 for a new trip.
         Version = "V1";
         Status = TripStatus.Scheduled;
@@ -71,33 +71,6 @@ public class Trip : AuditableAggregateRoot<long>
 
         VehicleId = vehicleId;
         AddDomainEvent(new TripVehicleAssigned(BusinessId, Id, vehicleId));
-    }
-
-    // Manage Destinations: add a TripDestination with an Order
-    public void AddDestination(TripDestination destination)
-    {
-        if (Status != TripStatus.Scheduled)
-            throw new InvalidOperationException("Cannot modify destinations after the trip has started.");
-
-        _destinations.Add(destination);
-        // Optionally, you might sort the list based on the Order value
-        _destinations.Sort((x, y) => x.Order.CompareTo(y.Order));
-        // Raise a domain event if needed (e.g., DestinationAdded)
-    }
-
-    public void RemoveDestination(TripDestination destination)
-    {
-        if (Status != TripStatus.Scheduled)
-            throw new InvalidOperationException("Cannot modify destinations after the trip has started.");
-
-        if (_destinations.Remove(destination))
-        {
-            // Optionally raise a domain event, e.g., DestinationRemoved.
-        }
-        else
-        {
-            throw new InvalidOperationException("Destination not found.");
-        }
     }
 
     // Methods for SubTrip management

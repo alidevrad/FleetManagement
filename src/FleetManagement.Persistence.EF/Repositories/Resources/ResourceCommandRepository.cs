@@ -2,6 +2,7 @@
 using FleetManagement.Domain.Models.Resources.Repositories;
 using FleetManagement.Persistence.EF.DbContextes;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace FleetManagement.Persistence.EF.Repositories.Resources;
 
@@ -9,34 +10,33 @@ public class ResourceCommandRepository : BaseCommandRepository<long, Resource>, 
 {
     public ResourceCommandRepository(FleetManagementDbContext context) : base(context) { }
 
-    public async Task<Resource> LockResource(long resourceId, string resourceType, DateTime startDateTime, DateTime endDateTime)
+    public async Task<bool> LockResource(long resourceId, string resourceType, DateTime startDateTime, DateTime endDateTime)
     {
-        var existingReservation = await _dbSet
-            .FirstOrDefaultAsync(r => r.ResourceId == resourceId &&
-                                      r.ResourceType == resourceType &&
-                                      r.StartDateTime < endDateTime &&
-                                      r.EndDateTime > startDateTime &&
-                                      r.IsLocked);
+        var strategy = _context.Database.CreateExecutionStrategy();
 
-        if (existingReservation != null)
+        return await strategy.ExecuteAsync(async () =>
         {
-            return null; // ❌ قبلاً لاک شده است
-        }
+            using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-        var reservation = new Resource(resourceId, resourceType, startDateTime, endDateTime, Guid.NewGuid());
-        await _dbSet.AddAsync(reservation);
-        await _context.SaveChangesAsync();
-        return reservation;
-    }
+            var existingReservation = await _dbSet
+                .FirstOrDefaultAsync(r => r.ResourceId == resourceId &&
+                                          r.ResourceType == resourceType &&
+                                          r.StartDateTime < endDateTime &&
+                                          r.EndDateTime > startDateTime &&
+                                          r.IsLocked);
 
-    public async Task<bool> IsResourceLocked(long resourceId, string resourceType, DateTime startDateTime)
-    {
-        return await _dbSet
-            .AnyAsync(r => r.ResourceId == resourceId &&
-                           r.ResourceType == resourceType &&
-                           r.StartDateTime <= startDateTime &&
-                           r.EndDateTime >= startDateTime &&
-                           r.IsLocked);
+            if (existingReservation != null)
+            {
+                return false; // ❌ Resource is already locked
+            }
+
+            var reservation = new Resource(resourceId, resourceType, startDateTime, endDateTime, Guid.NewGuid());
+            await _dbSet.AddAsync(reservation);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return true;
+        });
     }
 
     public async Task ReleaseResource(long resourceId, string resourceType)

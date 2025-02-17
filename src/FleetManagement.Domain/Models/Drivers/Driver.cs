@@ -81,13 +81,15 @@ public class Driver : AuditableAggregateRoot<long>
         return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && now >= r.Start && now < r.End);
     }
 
-    public void Reserve(DateTime start, DateTime end)
+    public ReservationPeriod Reserve(DateTime start, DateTime end)
     {
         if (!IsAvailableForPeriod(start, end))
             throw new InvalidOperationException("The selected time period overlaps with an existing reservation.");
 
         var reservation = new ReservationPeriod(start, end);
         _reservationPeriods.Add(reservation);
+
+        return reservation;
     }
 
     public void Release(long reservationId)

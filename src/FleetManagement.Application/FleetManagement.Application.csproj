@@ -7,7 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Trips\Commands\" />
+		<Folder Include="Resources\Queries\" />
+		<Folder Include="Trips\Commands\Validators\" />
 		<Folder Include="Trips\Queries\" />
 	</ItemGroup>
 

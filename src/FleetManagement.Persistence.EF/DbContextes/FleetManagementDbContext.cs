@@ -1,5 +1,6 @@
 ﻿using FleetManagement.Domain.Models.Drivers;
 using FleetManagement.Domain.Models.Resources;
+using FleetManagement.Domain.Models.Trips;
 using FleetManagement.Domain.Models.Vehicles;
 using FleetManagement.Domain.Models.VehicleTypes;
 using FleetManagement.Domain.Models.Warehouses;
@@ -15,6 +16,8 @@ public class FleetManagementDbContext : DbContext
     public virtual DbSet<Driver> Drivers { get; set; } = null!;
     public virtual DbSet<Resource> Reservations { get; set; }
     public virtual DbSet<VehicleType> VehicleTypes { get; set; } = null!;
+    public virtual DbSet<Trip> Trips { get; set; } = null!;
+    public virtual DbSet<Resource> Resources { get; set; } = null!;
 
     public FleetManagementDbContext(DbContextOptions options)
         : base(options) { }

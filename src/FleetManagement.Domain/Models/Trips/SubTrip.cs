@@ -7,7 +7,9 @@ public class SubTrip : AuditableEntity<long>
 {
     public long TripId { get; private set; }
     public string Origin { get; private set; }                // For example, a pickup address
-    public string Destination { get; private set; }           // For example, branch address
+
+    public DeliveryPoint DeliveryPoint { get; private set; }
+
     public string RouteDetails { get; private set; }          // JSON or text details from Google Maps API
     public TimeSpan EstimatedDuration { get; private set; }   // Estimated travel time
     public DateTime? EndTime { get; private set; }              // Actual completion time
@@ -17,15 +19,21 @@ public class SubTrip : AuditableEntity<long>
 
     protected SubTrip() { }
 
-    public SubTrip(long tripId, string origin, string destination, string routeDetails, TimeSpan estimatedDuration, double fuelConsumption, double delayTimeValue = 0)
+    public SubTrip(long tripId,
+                   string origin,
+                   DeliveryPoint deliveryPoint,
+                   string routeDetails,
+                   TimeSpan estimatedDuration,
+                   double fuelConsumption,
+                   double delayTimeValue = 0)
     {
         TripId = tripId;
         Origin = origin;
-        Destination = destination;
         RouteDetails = routeDetails;
         EstimatedDuration = estimatedDuration;
         FuelConsumption = fuelConsumption;
         DelayTimeValue = delayTimeValue;
+        DeliveryPoint = deliveryPoint;
         Status = SubTripStatus.Pending;
     }
 

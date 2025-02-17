@@ -1,4 +1,5 @@
 ﻿using FleetManagement.Domain.Common.BuildingBlocks.Events;
+using FleetManagement.Infrastructure.GoogleMaps;
 using FleetManagement.Infrastructure.Messaging.EventPublisher;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,10 @@ public static class ServiceRegisteration
         RegisterMediatREventPublisher(services);
     }
 
-    private static void RegisterGoogleMapService(this IServiceCollection services) { }
+    private static void RegisterGoogleMapService(this IServiceCollection services)
+    {
+        services.AddScoped<IGoogleMapService, GoogleMapService>();
+    }
 
     private static void RegisterMediatREventPublisher(this IServiceCollection services)
     {

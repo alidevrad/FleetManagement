@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FleetManagement.Application.Vehicles.Commands;
 
-public class ReserveVehicleCommandHandler : IRequestHandler<ReserveVehicleCommand>
+public class ReserveVehicleCommandHandler : IRequestHandler<ReserveVehicleCommand, long>
 {
     private readonly IVehicleCommandRepository _vehicleRepository;
     private readonly IVehicleQueryRepository _vehicleQueryRepository;
@@ -17,15 +17,17 @@ public class ReserveVehicleCommandHandler : IRequestHandler<ReserveVehicleComman
         _vehicleQueryRepository = vehicleQueryRepository;
     }
 
-    public async Task Handle(ReserveVehicleCommand request, CancellationToken cancellationToken)
+    public async Task<long> Handle(ReserveVehicleCommand request, CancellationToken cancellationToken)
     {
         var vehicle = await _vehicleQueryRepository.GetByIdAsync(request.Id);
         if (vehicle == null)
             throw new KeyNotFoundException("Vehicle not found.");
 
-        vehicle.Reserve(request.Start, request.End);
+        var reservationPeriod = vehicle.Reserve(request.Start, request.End);
         _vehicleRepository.Update(vehicle);
 
         await _vehicleRepository.SaveChangesAsync();
+
+        return reservationPeriod.Id;
     }
 }

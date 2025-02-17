@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FleetManagement.Application.Drivers.Commands;
 
-public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand>
+public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand, long>
 {
     private readonly IDriverCommandRepository _driverRepository;
     private readonly IDriverQueryRepository _driverQueryRepository;
@@ -17,7 +17,7 @@ public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand>
         _driverQueryRepository = driverQueryRepository;
     }
 
-    public async Task Handle(ReserveDriverCommand request, CancellationToken cancellationToken)
+    public async Task<long> Handle(ReserveDriverCommand request, CancellationToken cancellationToken)
     {
         var driver = await _driverQueryRepository.GetByIdAsync(request.Id);
         if (driver == null)
@@ -25,10 +25,12 @@ public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand>
             throw new KeyNotFoundException("Driver not found.");
         }
 
-        driver.Reserve(request.Start, request.End);
+        var reservationPeriod = driver.Reserve(request.Start, request.End);
 
         _driverRepository.Update(driver);
         await _driverRepository.SaveChangesAsync();
+
+        return reservationPeriod.Id;
     }
 }
 

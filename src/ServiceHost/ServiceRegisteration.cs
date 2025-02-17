@@ -54,7 +54,8 @@ public static class ServiceRegisteration
                 { "vehicles", "Vehicles API" },
                 { "vehicleTypes", "VehicleTypes API" },
                 { "warehouses", "Warehouses API" },
-                { "customers", "Customers API" }
+                { "customers", "Customers API" },
+                { "trips","Trips API"}
             };
 
             foreach (var group in apiGroups)

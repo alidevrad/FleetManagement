@@ -27,6 +27,7 @@
 	<ItemGroup>
 	  <Folder Include="Customers\Models\" />
 	  <Folder Include="Drivers\Models\" />
+	  <Folder Include="Trips\Models\" />
 	  <Folder Include="Vehicles\Models\" />
 	  <Folder Include="VehicleTypes\Models\" />
 	  <Folder Include="Warehouses\Models\" />

@@ -14,4 +14,9 @@
     <ProjectReference Include="..\FleetManagement.Domain\FleetManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Queries\" />
+    <Folder Include="Trips\Queries\" />
+  </ItemGroup>
+
 </Project>

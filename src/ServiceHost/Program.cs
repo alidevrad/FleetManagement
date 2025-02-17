@@ -22,6 +22,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/vehicleTypes/swagger.json", "VehicleTypes API");
         c.SwaggerEndpoint("/swagger/warehouses/swagger.json", "Warehouses API");
         c.SwaggerEndpoint("/swagger/customers/swagger.json", "Customers API");
+        c.SwaggerEndpoint("/swagger/trips/swagger.json", "Trips API");
     });
 }
 
