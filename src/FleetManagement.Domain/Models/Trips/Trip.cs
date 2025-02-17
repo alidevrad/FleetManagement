@@ -4,7 +4,6 @@ using FleetManagement.Domain.Models.Trips.Events;
 
 namespace FleetManagement.Domain.Models.Trips;
 
-// Represents the entire trip with multiple stops.
 public class Trip : AuditableAggregateRoot<long>
 {
     #region Properties
@@ -18,11 +17,10 @@ public class Trip : AuditableAggregateRoot<long>
     public long DriverId { get; private set; }
     public long VehicleId { get; private set; }
 
-    public double TotalDelayTime { get; private set; }          // Sum of unloading delays (in minutes)
+    public double TotalDelayTime { get; private set; }
     public double TotalTripDuration { get; private set; }         // Google Maps API duration + TotalDelayTime (in minutes)
-    public double TotalFuelConsumption { get; private set; }      // Total fuel consumption (liters, for example)
+    public double TotalFuelConsumption { get; private set; }
 
-    // A human-readable version number for the Trip (e.g., "V1", "V2", etc.)
     public string Version { get; private set; }
 
     private readonly List<SubTrip> _subTrips = new();
@@ -46,7 +44,6 @@ public class Trip : AuditableAggregateRoot<long>
         DriverId = driverId;
         VehicleId = vehicleId;
 
-        // Initialize version as V1 for a new trip.
         Version = "V1";
         Status = TripStatus.Scheduled;
     }
@@ -73,7 +70,6 @@ public class Trip : AuditableAggregateRoot<long>
         AddDomainEvent(new TripVehicleAssigned(BusinessId, Id, vehicleId));
     }
 
-    // Methods for SubTrip management
     public void AddSubTrip(SubTrip subTrip)
     {
         if (subTrip.TripId != Id)
@@ -94,7 +90,6 @@ public class Trip : AuditableAggregateRoot<long>
         AddDomainEvent(new SubTripRemoved(BusinessId, Id, subTrip.Id));
     }
 
-    // Methods for starting, completing, or canceling the trip
     public void StartTrip()
     {
         if (Status != TripStatus.Scheduled)
@@ -111,7 +106,6 @@ public class Trip : AuditableAggregateRoot<long>
 
         Status = TripStatus.Completed;
         ActualEndTime = DateTime.UtcNow;
-        // Upon completion, update the version for reporting purposes.
         UpdateVersion();
         AddDomainEvent(new TripCompleted(BusinessId, Id));
     }
@@ -126,7 +120,6 @@ public class Trip : AuditableAggregateRoot<long>
         AddDomainEvent(new TripCanceled(BusinessId, Id));
     }
 
-    // Methods for calculating totals from SubTrip items
     public void CalculateTotalDelayTime()
     {
         TotalDelayTime = _subTrips.Sum(subTrip => subTrip.DelayTimeValue);
@@ -143,10 +136,8 @@ public class Trip : AuditableAggregateRoot<long>
         TotalFuelConsumption = _subTrips.Sum(subTrip => subTrip.FuelConsumption);
     }
 
-    // Method to update the version string
     private void UpdateVersion()
     {
-        // For example, append an incrementing counter or a timestamp. Here we simply use a timestamp.
         Version = "V" + DateTime.UtcNow.ToString("yyyyMMddHHmmss");
     }
 

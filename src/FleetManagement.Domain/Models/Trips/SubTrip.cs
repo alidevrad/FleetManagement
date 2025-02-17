@@ -6,16 +6,16 @@ namespace FleetManagement.Domain.Models.Trips;
 public class SubTrip : AuditableEntity<long>
 {
     public long TripId { get; private set; }
-    public string Origin { get; private set; }                // For example, a pickup address
+    public string Origin { get; private set; }
 
     public DeliveryPoint DeliveryPoint { get; private set; }
 
-    public string RouteDetails { get; private set; }          // JSON or text details from Google Maps API
-    public TimeSpan EstimatedDuration { get; private set; }   // Estimated travel time
-    public DateTime? EndTime { get; private set; }              // Actual completion time
-    public SubTripStatus Status { get; private set; }           // Pending, InProgress, Completed, Canceled
-    public double FuelConsumption { get; private set; }         // Fuel consumed during this leg
-    public double DelayTimeValue { get; private set; }          // Unloading delay (in minutes)
+    public string RouteDetails { get; private set; }
+    public TimeSpan EstimatedDuration { get; private set; }
+    public DateTime? EndTime { get; private set; }
+    public SubTripStatus Status { get; private set; }
+    public double FuelConsumption { get; private set; }
+    public double DelayTimeValue { get; private set; }
 
     protected SubTrip() { }
 
