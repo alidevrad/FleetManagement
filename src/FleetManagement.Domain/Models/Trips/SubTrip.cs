@@ -17,6 +17,9 @@ public class SubTrip : AuditableEntity<long>
     public double FuelConsumption { get; private set; }
     public double DelayTimeValue { get; private set; }
 
+    //TODO: setup StartDateTime
+    public DateTime StartDateTime { get; private set; }
+
     protected SubTrip() { }
 
     public SubTrip(long tripId,

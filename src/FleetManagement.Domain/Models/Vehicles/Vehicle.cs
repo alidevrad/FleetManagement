@@ -8,6 +8,8 @@ public class Vehicle : AuditableAggregateRoot<long>
 {
     #region Properties
 
+    //TODO: Add platnumber image that should be optional.
+
     public long VehicleTypeId { get; private set; }
     public string Manufacturer { get; private set; }
     public string LicensePlateNumber { get; private set; }
