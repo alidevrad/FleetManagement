@@ -19,15 +19,18 @@ public class ReserveVehicleCommandHandler : IRequestHandler<ReserveVehicleComman
 
     public async Task<long> Handle(ReserveVehicleCommand request, CancellationToken cancellationToken)
     {
-        var vehicle = await _vehicleQueryRepository.GetByIdAsync(request.Id);
-        if (vehicle == null)
-            throw new KeyNotFoundException("Vehicle not found.");
+        //TODO: Next phase
+        //var vehicle = await _vehicleQueryRepository.GetByIdAsync(request.Id);
+        //if (vehicle == null)
+        //    throw new KeyNotFoundException("Vehicle not found.");
 
-        var reservationPeriod = vehicle.Reserve(request.Start, request.End);
-        _vehicleRepository.Update(vehicle);
+        //var reservationPeriod = vehicle.Reserve(request.Start, request.End);
+        //_vehicleRepository.Update(vehicle);
 
-        await _vehicleRepository.SaveChangesAsync();
+        //await _vehicleRepository.SaveChangesAsync();
 
-        return reservationPeriod.Id;
+        //return reservationPeriod.Id;
+
+        return await Task.FromResult(-1);
     }
 }

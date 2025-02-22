@@ -1,11 +1,9 @@
-﻿using FleetManagement.Domain.Models.Shared;
-using FleetManagement.Domain.Models.Vehicles;
+﻿using FleetManagement.Domain.Models.Vehicles;
 using FleetManagement.Domain.Models.VehicleTypes;
 using FleetManagement.Persistence.EF.Common;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FleetManagement.Persistence.EF.Mappings.Vehicles;
 
@@ -35,6 +33,13 @@ public class VehicleConfiguration : AuditableAggregateRootConfiguration<Vehicle,
                .HasForeignKey(v => v.VehicleTypeId)
                .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(d => d.IsActive)
+               .IsRequired();
+
+        builder.Property(v => v.LicensePlateImageUrl)
+               .HasMaxLength(500)
+               .IsRequired(false);
+
         builder.OwnsMany(v => v.VehicleMaintenances, map =>
         {
             map.HasKey(v => v.Id);
@@ -57,34 +62,35 @@ public class VehicleConfiguration : AuditableAggregateRootConfiguration<Vehicle,
             map.UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
-        builder.OwnsMany(d => d.ReservationPeriods, reservation =>
-        {
-            reservation.ToTable("VehicleReservationPeriods");
+        //TODO: Next phase
+        //builder.OwnsMany(d => d.ReservationPeriods, reservation =>
+        //{
+        //    reservation.ToTable("VehicleReservationPeriods");
 
-            reservation.WithOwner().HasForeignKey("DriverId");
+        //    reservation.WithOwner().HasForeignKey("DriverId");
 
-            reservation.Property(r => r.Start)
-                .IsRequired()
-                .HasColumnType("datetime2");
+        //    reservation.Property(r => r.Start)
+        //        .IsRequired()
+        //        .HasColumnType("datetime2");
 
-            reservation.Property(r => r.End)
-                .IsRequired()
-                .HasColumnType("datetime2");
+        //    reservation.Property(r => r.End)
+        //        .IsRequired()
+        //        .HasColumnType("datetime2");
 
-            reservation.Property(r => r.Status)
-                .IsRequired()
-                .HasConversion(new EnumToNumberConverter<ReservationStatus, byte>());
+        //    reservation.Property(r => r.Status)
+        //        .IsRequired()
+        //        .HasConversion(new EnumToNumberConverter<ReservationStatus, byte>());
 
-            reservation.Property(r => r.ActivatedAt)
-                .HasColumnType("datetime2");
+        //    reservation.Property(r => r.ActivatedAt)
+        //        .HasColumnType("datetime2");
 
-            reservation.Property(r => r.CanceledAt)
-                .HasColumnType("datetime2");
+        //    reservation.Property(r => r.CanceledAt)
+        //        .HasColumnType("datetime2");
 
-            reservation.Property(r => r.FinishedAt)
-                .HasColumnType("datetime2");
+        //    reservation.Property(r => r.FinishedAt)
+        //        .HasColumnType("datetime2");
 
-            reservation.UsePropertyAccessMode(PropertyAccessMode.Field);
-        });
+        //    reservation.UsePropertyAccessMode(PropertyAccessMode.Field);
+        //});
     }
 }

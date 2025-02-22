@@ -29,7 +29,8 @@ public class CreateDriverCommandHandler : IRequestHandler<CreateDriverCommand, l
             request.NativeLanguage,
             request.LicenseIssueDate,
             request.LicenseExpirationDate,
-            businessId
+            businessId,
+            request.ImageUrl
         );
 
         await _driverRepository.AddAsync(driver);

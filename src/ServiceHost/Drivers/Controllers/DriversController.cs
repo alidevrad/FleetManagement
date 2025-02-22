@@ -54,26 +54,6 @@ public class DriversController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/reserve")]
-    public async Task<IActionResult> Reserve(long id, [FromBody] ReserveDriverCommand command)
-    {
-        if (id != command.Id)
-            return BadRequest("Mismatched driver ID");
-
-        await _mediator.Send(command);
-        return NoContent();
-    }
-
-    [HttpPost("{id}/release")]
-    public async Task<IActionResult> Release(long id, [FromBody] ReleaseDriverFromReservationCommand command)
-    {
-        if (id != command.Id)
-            return BadRequest("Mismatched driver ID");
-
-        await _mediator.Send(command);
-        return NoContent();
-    }
-
     [HttpPost("{id}/add-emergency-contact")]
     public async Task<IActionResult> AddEmergencyContact(long id, [FromBody] AddEmergencyContactCommand command)
     {
@@ -93,5 +73,31 @@ public class DriversController : ControllerBase
         await _mediator.Send(command);
         return NoContent();
     }
+
+    #region Next phase
+
+    //TODO: Next phase
+
+    //[HttpPost("{id}/reserve")]
+    //public async Task<IActionResult> Reserve(long id, [FromBody] ReserveDriverCommand command)
+    //{
+    //    if (id != command.Id)
+    //        return BadRequest("Mismatched driver ID");
+
+    //    await _mediator.Send(command);
+    //    return NoContent();
+    //}
+
+    //[HttpPost("{id}/release")]
+    //public async Task<IActionResult> Release(long id, [FromBody] ReleaseDriverFromReservationCommand command)
+    //{
+    //    if (id != command.Id)
+    //        return BadRequest("Mismatched driver ID");
+
+    //    await _mediator.Send(command);
+    //    return NoContent();
+    //}
+
+    #endregion
 }
 

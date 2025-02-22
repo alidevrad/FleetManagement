@@ -3,9 +3,6 @@ using FleetManagement.Domain.Models.Trips.Enums;
 
 namespace FleetManagement.Application.Contract.Trips.Commands;
 
-/// <summary>
-/// فرمان ایجاد یک سفر جدید
-/// </summary>
 public record CreateTripCommand(
     string TripName,
     DateTime StartDateTime,
@@ -18,9 +15,7 @@ public record CreateTripCommand(
     Guid BusinessId                             // شناسه‌ی تجاری (برای traceability)
 ) : ICommand<long>;
 
-/// <summary>
-/// DTO برای زیرسفرهای یک سفر
-/// </summary>
+
 public record CreateSubTripDto(
     string Origin,            // مبدا
     DeliveryPointDto DeliveryPoint, // مقصد
@@ -32,9 +27,6 @@ public record CreateSubTripDto(
     double DelayTimeValue     // میزان تأخیر در زیرسفر
 );
 
-/// <summary>
-/// DTO برای مقصد زیرسفر
-/// </summary>
 public record DeliveryPointDto(
     long BranchId,
     int Order,

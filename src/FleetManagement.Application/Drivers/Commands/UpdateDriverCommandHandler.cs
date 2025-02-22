@@ -36,7 +36,8 @@ public class UpdateDriverCommandHandler : IRequestHandler<UpdateDriverCommand>
             request.LicenseType,
             request.NativeLanguage,
             request.LicenseIssueDate,
-            request.LicenseExpirationDate
+            request.LicenseExpirationDate,
+            request.ImageUrl
         );
 
         _driverRepository.Update(driver);

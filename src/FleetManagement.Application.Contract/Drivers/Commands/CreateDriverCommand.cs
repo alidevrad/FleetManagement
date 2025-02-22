@@ -13,4 +13,5 @@ public record CreateDriverCommand(string FirstName,
                                   string LicenseType,
                                   string NativeLanguage,
                                   DateTime LicenseIssueDate,
-                                  DateTime LicenseExpirationDate) : ICommand<long>;
+                                  DateTime LicenseExpirationDate,
+                                  string ImageUrl) : ICommand<long>;

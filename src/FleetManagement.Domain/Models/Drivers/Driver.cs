@@ -2,7 +2,6 @@
 using FleetManagement.Domain.Common.BuildingBlocks.Core;
 using FleetManagement.Domain.Models.Drivers.Enums;
 using FleetManagement.Domain.Models.Drivers.Events;
-using FleetManagement.Domain.Models.Shared;
 
 namespace FleetManagement.Domain.Models.Drivers;
 
@@ -20,15 +19,13 @@ public class Driver : AuditableAggregateRoot<long>
     public DateTime LicenseIssueDate { get; private set; }
     public DateTime LicenseExpirationDate { get; private set; }
     public string NativeLanguage { get; private set; }
+    public string ImageUrl { get; private set; }
 
     private readonly List<TrainingQualification> _trainingQualifications = new();
     public IReadOnlyList<TrainingQualification> TrainingQualifications => _trainingQualifications.AsReadOnly();
 
     private readonly List<EmergencyContact> _emergencyContacts = new();
     public IReadOnlyList<EmergencyContact> EmergencyContacts => _emergencyContacts.AsReadOnly();
-
-    private readonly List<ReservationPeriod> _reservationPeriods = new();
-    public IReadOnlyList<ReservationPeriod> ReservationPeriods => _reservationPeriods.AsReadOnly();
 
     public bool IsActive { get; private set; }
 
@@ -49,8 +46,8 @@ public class Driver : AuditableAggregateRoot<long>
         string nativeLanguage,
         DateTime licenseIssueDate,
         DateTime licenseExpirationDate,
-        Guid businessId
-        )
+        Guid businessId,
+        string imageUrl)
         : base(businessId)
     {
         FirstName = firstName;
@@ -62,56 +59,15 @@ public class Driver : AuditableAggregateRoot<long>
         LicenseType = licenseType;
         LicenseIssueDate = licenseIssueDate;
         LicenseExpirationDate = licenseExpirationDate;
-        IsActive = true;
         NativeLanguage = nativeLanguage;
+        ImageUrl = imageUrl;
+
+        IsActive = true;
     }
 
     #endregion
 
     #region Methods
-
-    public bool IsAvailableForPeriod(DateTime start, DateTime end)
-    {
-        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && r.Overlaps(start, end));
-    }
-
-    public bool IsCurrentlyAvailable()
-    {
-        var now = DateTime.UtcNow;
-        return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && now >= r.Start && now < r.End);
-    }
-
-    public ReservationPeriod Reserve(DateTime start, DateTime end)
-    {
-        if (!IsAvailableForPeriod(start, end))
-            throw new InvalidOperationException("The selected time period overlaps with an existing reservation.");
-
-        var reservation = new ReservationPeriod(start, end);
-        _reservationPeriods.Add(reservation);
-
-        return reservation;
-    }
-
-    public void Release(long reservationId)
-    {
-        var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
-        if (reservation == null)
-            throw new InvalidOperationException("Reservation not found.");
-
-        if (reservation.Status == ReservationStatus.Cancelled)
-            throw new InvalidOperationException("Reservation is already cancelled.");
-
-        reservation.Cancel();
-    }
-
-    public void CompleteReservation(long reservationId)
-    {
-        var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
-        if (reservation == null)
-            throw new InvalidOperationException("Reservation not found.");
-
-        reservation.Finish();
-    }
 
     public void Activate()
     {
@@ -151,7 +107,8 @@ public class Driver : AuditableAggregateRoot<long>
     string licenseType,
     string nativeLanguage,
     DateTime licenseIssueDate,
-    DateTime licenseExpirationDate
+    DateTime licenseExpirationDate,
+    string imageUrl
     )
     {
         FirstName = firstName;
@@ -164,7 +121,60 @@ public class Driver : AuditableAggregateRoot<long>
         LicenseIssueDate = licenseIssueDate;
         LicenseExpirationDate = licenseExpirationDate;
         NativeLanguage = nativeLanguage;
+        ImageUrl = imageUrl;
     }
+
+    #endregion
+
+    #region Next phase
+
+    //TODO: Next phase
+
+    //private readonly List<ReservationPeriod> _reservationPeriods = new();
+    //public IReadOnlyList<ReservationPeriod> ReservationPeriods => _reservationPeriods.AsReadOnly();
+
+    //public bool IsAvailableForPeriod(DateTime start, DateTime end)
+    //{
+    //    return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && r.Overlaps(start, end));
+    //}
+
+    //public bool IsCurrentlyAvailable()
+    //{
+    //    var now = DateTime.UtcNow;
+    //    return !_reservationPeriods.Any(r => r.Status == ReservationStatus.Active && now >= r.Start && now < r.End);
+    //}
+
+    //public ReservationPeriod Reserve(DateTime start, DateTime end)
+    //{
+    //    if (!IsAvailableForPeriod(start, end))
+    //        throw new InvalidOperationException("The selected time period overlaps with an existing reservation.");
+
+    //    var reservation = new ReservationPeriod(start, end);
+    //    _reservationPeriods.Add(reservation);
+
+    //    return reservation;
+    //}
+
+    //public void Release(long reservationId)
+    //{
+    //    var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
+    //    if (reservation == null)
+    //        throw new InvalidOperationException("Reservation not found.");
+
+    //    if (reservation.Status == ReservationStatus.Cancelled)
+    //        throw new InvalidOperationException("Reservation is already cancelled.");
+
+    //    reservation.Cancel();
+    //}
+
+    //public void CompleteReservation(long reservationId)
+    //{
+    //    var reservation = _reservationPeriods.FirstOrDefault(r => r.Id == reservationId);
+    //    if (reservation == null)
+    //        throw new InvalidOperationException("Reservation not found.");
+
+    //    reservation.Finish();
+    //}
 
     #endregion
 }

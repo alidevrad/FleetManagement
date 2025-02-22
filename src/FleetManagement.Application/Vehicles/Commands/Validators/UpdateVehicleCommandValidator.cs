@@ -27,5 +27,10 @@ public class UpdateVehicleCommandValidator : AbstractValidator<UpdateVehicleComm
         RuleFor(v => v.Color)
             .NotEmpty().WithMessage("Color is required.")
             .MaximumLength(50).WithMessage("Color must be at most 50 characters.");
+
+        RuleFor(v => v.LicensePlateImageUrl)
+           .MaximumLength(500).WithMessage("License Plate Image URL must be at most 500 characters.")
+           .Must(uri => string.IsNullOrEmpty(uri) || Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+           .WithMessage("License Plate Image URL must be a valid absolute URL.");
     }
 }

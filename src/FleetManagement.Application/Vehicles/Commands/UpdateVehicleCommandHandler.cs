@@ -31,7 +31,8 @@ public class UpdateVehicleCommandHandler : IRequestHandler<UpdateVehicleCommand>
             request.Manufacturer,
             request.LicensePlateNumber,
             request.ModelYear,
-            request.Color
+            request.Color,
+            request.LicensePlateImageUrl
         );
 
         _vehicleRepository.Update(vehicle);

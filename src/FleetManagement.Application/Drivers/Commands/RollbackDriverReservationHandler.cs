@@ -21,7 +21,8 @@ public class RollbackDriverReservationHandler : IRequestHandler<RollbackDriverRe
         if (driver == null)
             throw new InvalidOperationException("Driver not found.");
 
-        driver.Release(command.ReservationId);
+        //TODO: Next phase
+        //driver.Release(command.ReservationId);
 
         _commandRepository.Update(driver);
         await _commandRepository.SaveChangesAsync();

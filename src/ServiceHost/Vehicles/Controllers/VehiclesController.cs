@@ -40,23 +40,17 @@ public class VehiclesController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/reserve")]
-    public async Task<IActionResult> Reserve(long id, [FromBody] ReserveVehicleCommand command)
+    [HttpPost("{id}/activate")]
+    public async Task<IActionResult> Activate(long id)
     {
-        if (id != command.Id)
-            return BadRequest("Mismatched vehicle ID");
-
-        await _mediator.Send(command);
+        await _mediator.Send(new ActivateVehicleCommand(id));
         return NoContent();
     }
 
-    [HttpPost("{id}/release")]
-    public async Task<IActionResult> Release(long id, [FromBody] ReleaseVehicleFromReservationCommand command)
+    [HttpPost("{id}/deactivate")]
+    public async Task<IActionResult> Deactivate(long id)
     {
-        if (id != command.Id)
-            return BadRequest("Mismatched vehicle ID");
-
-        await _mediator.Send(command);
+        await _mediator.Send(new DeactivateVehicleCommand(id));
         return NoContent();
     }
 
@@ -69,4 +63,30 @@ public class VehiclesController : ControllerBase
         await _mediator.Send(command);
         return NoContent();
     }
+
+    #region Next phase
+
+    //TODO: Next phase
+
+    //[HttpPost("{id}/reserve")]
+    //public async Task<IActionResult> Reserve(long id, [FromBody] ReserveVehicleCommand command)
+    //{
+    //    if (id != command.Id)
+    //        return BadRequest("Mismatched vehicle ID");
+
+    //    await _mediator.Send(command);
+    //    return NoContent();
+    //}
+
+    //[HttpPost("{id}/release")]
+    //public async Task<IActionResult> Release(long id, [FromBody] ReleaseVehicleFromReservationCommand command)
+    //{
+    //    if (id != command.Id)
+    //        return BadRequest("Mismatched vehicle ID");
+
+    //    await _mediator.Send(command);
+    //    return NoContent();
+    //}
+
+    #endregion
 }

@@ -8,5 +8,6 @@ public record UpdateVehicleCommand(
         string Manufacturer,
         string LicensePlateNumber,
         int ModelYear,
-        string Color
+        string Color,
+        string LicensePlateImageUrl
     ) : ICommand;

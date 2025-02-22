@@ -42,5 +42,10 @@ public class CreateDriverCommandValidator : AbstractValidator<CreateDriverComman
 
         RuleFor(d => d.LicenseExpirationDate)
             .GreaterThan(DateTime.UtcNow).WithMessage("License expiration date must be in the future.");
+
+        RuleFor(v => v.ImageUrl)
+           .MaximumLength(500).WithMessage("Driver's Image URL must be at most 500 characters.")
+           .Must(uri => string.IsNullOrEmpty(uri) || Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+           .WithMessage("Driver's Image URL must be a valid absolute URL.");
     }
 }

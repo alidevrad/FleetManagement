@@ -23,7 +23,8 @@ public class ReleaseVehicleFromReservationCommandHandler : IRequestHandler<Relea
         if (vehicle == null)
             throw new KeyNotFoundException("Vehicle not found.");
 
-        vehicle.Release(request.ReservationId);
+        //TODO: Next phase
+        //vehicle.Release(request.ReservationId);
         _vehicleRepository.Update(vehicle);
 
         await _vehicleRepository.SaveChangesAsync();

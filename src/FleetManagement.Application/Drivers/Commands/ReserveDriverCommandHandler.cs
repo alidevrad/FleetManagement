@@ -19,18 +19,20 @@ public class ReserveDriverCommandHandler : IRequestHandler<ReserveDriverCommand,
 
     public async Task<long> Handle(ReserveDriverCommand request, CancellationToken cancellationToken)
     {
-        var driver = await _driverQueryRepository.GetByIdAsync(request.Id);
-        if (driver == null)
-        {
-            throw new KeyNotFoundException("Driver not found.");
-        }
+        //TODO: Next phase
+        //var driver = await _driverQueryRepository.GetByIdAsync(request.Id);
+        //if (driver == null)
+        //{
+        //    throw new KeyNotFoundException("Driver not found.");
+        //}
 
-        var reservationPeriod = driver.Reserve(request.Start, request.End);
+        //var reservationPeriod = driver.Reserve(request.Start, request.End);
 
-        _driverRepository.Update(driver);
-        await _driverRepository.SaveChangesAsync();
+        //_driverRepository.Update(driver);
+        //await _driverRepository.SaveChangesAsync();
 
-        return reservationPeriod.Id;
+        //return reservationPeriod.Id;
+        return await Task.FromResult(-1);
     }
 }
 

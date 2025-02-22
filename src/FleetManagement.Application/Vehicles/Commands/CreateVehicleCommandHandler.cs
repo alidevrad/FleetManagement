@@ -35,7 +35,8 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
             request.LicensePlateNumber,
             request.ModelYear,
             request.Color,
-            businessId
+            businessId,
+            request.LicensePlateImageUrl
         );
 
         await _vehicleRepository.AddAsync(vehicle);

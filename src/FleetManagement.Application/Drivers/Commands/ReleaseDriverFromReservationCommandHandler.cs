@@ -25,7 +25,8 @@ public class ReleaseDriverFromReservationCommandHandler : IRequestHandler<Releas
             throw new KeyNotFoundException("Driver not found.");
         }
 
-        driver.Release(request.ReservationId);
+        //TODO: Next phase
+        //driver.Release(request.ReservationId);
 
         _driverRepository.Update(driver);
         await _driverRepository.SaveChangesAsync();

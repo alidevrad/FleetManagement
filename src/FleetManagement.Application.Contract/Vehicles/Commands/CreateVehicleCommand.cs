@@ -7,5 +7,6 @@ public record CreateVehicleCommand(
     string Manufacturer,
     string LicensePlateNumber,
     int ModelYear,
-    string Color
+    string Color,
+    string LicensePlateImageUrl
 ) : ICommand<long>;

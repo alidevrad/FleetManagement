@@ -14,4 +14,5 @@ public record UpdateDriverCommand(long Id,
                                   string LicenseType,
                                   string NativeLanguage,
                                   DateTime LicenseIssueDate,
-                                  DateTime LicenseExpirationDate) : ICommand;
+                                  DateTime LicenseExpirationDate,
+                                  string ImageUrl) : ICommand;

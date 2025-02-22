@@ -22,7 +22,8 @@ public class RollbackVehicleReservationHandler : IRequestHandler<RollbackVehicle
         if (vehicle == null)
             throw new InvalidOperationException("Vehicle not found.");
 
-        vehicle.Release(command.ReservationId);
+        //TODO: Next phase
+        //vehicle.Release(command.ReservationId);
 
         _commandRepository.Update(vehicle);
         await _commandRepository.SaveChangesAsync();
