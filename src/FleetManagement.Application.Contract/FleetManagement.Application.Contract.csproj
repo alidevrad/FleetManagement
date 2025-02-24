@@ -17,6 +17,7 @@
   <ItemGroup>
     <Folder Include="Resources\Queries\" />
     <Folder Include="Trips\Queries\" />
+    <Folder Include="Users\Queries\" />
   </ItemGroup>
 
 </Project>

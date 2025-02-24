@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FleetManagement.Application\FleetManagement.Application.csproj" />
     <ProjectReference Include="..\FleetManagement.Domain\FleetManagement.Domain.csproj" />
+    <ProjectReference Include="..\FleetManagement.Infrastructure.Authentication\FleetManagement.Infrastructure.Authentication.csproj" />
     <ProjectReference Include="..\FleetManagement.Infrastructure\FleetManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\FleetManagement.Persistence.EF\FleetManagement.Persistence.EF.csproj" />
   </ItemGroup>

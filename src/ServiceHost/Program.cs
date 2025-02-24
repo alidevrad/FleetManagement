@@ -1,12 +1,16 @@
-using FleetManagement.Config;
+﻿using FleetManagement.Config;
+using FleetManagement.Infrastructure.Authentication.Configurations;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServiceHost;
 using ServiceHost.Common.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.RegisterBuiltInServices();
+builder.Services.Configure<AuthConfig>(builder.Configuration.GetSection("AuthConfig"));
+
+builder.Services.RegisterBuiltInServices(builder.Configuration);
 
 Bootstrapper.WireUpModule(builder.Services, builder.Configuration);
 
@@ -23,12 +27,15 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/warehouses/swagger.json", "Warehouses API");
         c.SwaggerEndpoint("/swagger/customers/swagger.json", "Customers API");
         c.SwaggerEndpoint("/swagger/trips/swagger.json", "Trips API");
+        c.SwaggerEndpoint("/swagger/users/swagger.json", "Users API");
     });
 }
 
 app.UseGlobalExceptionHandling();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

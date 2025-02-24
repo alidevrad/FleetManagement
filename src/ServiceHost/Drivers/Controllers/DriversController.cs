@@ -1,11 +1,13 @@
 ﻿using FleetManagement.Application.Contract.Drivers.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace ServiceHost.Drivers.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class DriversController : ControllerBase
 {
