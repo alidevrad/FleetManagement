@@ -65,7 +65,7 @@ public class VehiclesController : ControllerBase
     }
 
     [HttpPut("{vehicleId}/update-maintenance/{maintenanceId}")]
-    public async Task<IActionResult> UpdateBranch(long vehicleId, long maintenanceId, [FromBody] UpdateVehicleMaintenanceCommand command)
+    public async Task<IActionResult> UpdateVehicleMaintenance(long vehicleId, long maintenanceId, [FromBody] UpdateVehicleMaintenanceCommand command)
     {
         if (vehicleId != command.Id || maintenanceId != command.VehicleMaintenanceId)
             return BadRequest("Mismatched vehicle or maintenance ID");
