@@ -18,9 +18,6 @@ public class WarehousesQueryController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Get a warehouse by ID.
-    /// </summary>
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Warehouse>> GetById(long id)
     {
@@ -28,9 +25,6 @@ public class WarehousesQueryController : ControllerBase
         return warehouse != null ? Ok(warehouse) : NotFound();
     }
 
-    /// <summary>
-    /// Get all warehouses.
-    /// </summary>
     [HttpGet]
     public async Task<ActionResult<List<Warehouse>>> GetAll()
     {
@@ -38,10 +32,6 @@ public class WarehousesQueryController : ControllerBase
         return Ok(warehouses);
     }
 
-    /// <summary>
-    /// Find warehouses by filter.
-    /// Example usage: /api/WarehouseQuery/find?city=NewYork
-    /// </summary>
     [HttpGet("find")]
     public async Task<ActionResult<List<Warehouse>>> Find([FromQuery] string? city, [FromQuery] string? state)
     {

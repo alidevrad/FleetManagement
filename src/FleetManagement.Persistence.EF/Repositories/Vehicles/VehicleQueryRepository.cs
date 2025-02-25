@@ -2,10 +2,28 @@
 using FleetManagement.Domain.Models.Vehicles.Repositories;
 using FleetManagement.Persistence.EF.DbContextes;
 using FleetManagement.Persistence.EF.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 public class VehicleQueryRepository : BaseQueryRepository<long, Vehicle>, IVehicleQueryRepository
 {
     public VehicleQueryRepository(FleetManagementDbContext context) : base(context) { }
+
+    public async Task<VehicleMaintenance> GetSpecificVehicleMaintenanceOfVehicle(long vehicleId, long vehicleMaintenanceId)
+    {
+        return await _dbSet.Where(c => c.Id == vehicleId)
+                           .SelectMany(c => c.VehicleMaintenances)
+                           .Where(b => b.Id == vehicleMaintenanceId)
+                           .AsNoTracking()
+                           .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<VehicleMaintenance>> GetVehicleMaintenancesByVehicleId(long vehicleId)
+    {
+        return await _dbSet.Where(v => v.Id == vehicleId)
+                           .SelectMany(v => v.VehicleMaintenances)
+                           .AsNoTracking()
+                           .ToListAsync();
+    }
 }
 
 //TODO: Next phase

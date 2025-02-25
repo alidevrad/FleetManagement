@@ -32,4 +32,18 @@ public class VehiclesQueryController : ControllerBase
         return Ok(vehicles);
     }
 
+    [HttpGet("{vehicleId:long}/maintenances")]
+    public async Task<ActionResult<List<VehicleMaintenance>>> GetVehicleMaintenances(long vehicleId)
+    {
+        var maintenances = await _mediator.Send(new GetVehicleMaintenancesQuery(vehicleId));
+
+        return maintenances != null && maintenances.Count > 0 ? Ok(maintenances) : NotFound();
+    }
+
+    [HttpGet("{vehicleId:long}/maintenances/{vehicleMaintenanceId:long}")]
+    public async Task<ActionResult<VehicleMaintenance>> GetSpecificBranchOfCustomer(long vehicleId, long vehicleMaintenanceId)
+    {
+        var maintenance = await _mediator.Send(new GetSpecificVehicleMaintenanceOfVehicleQuery(vehicleId, vehicleMaintenanceId));
+        return maintenance != null ? Ok(maintenance) : NotFound();
+    }
 }

@@ -3,4 +3,5 @@ using MediatR;
 
 namespace FleetManagement.Application.Contract.Customers.Queries;
 
-public record GetCustomerByIdQuery(long Id) : IRequest<Customer>;
+public record GetSpecificBranchOfCustomerQuery(long CustomerId, long BranchId) : IRequest<Branch>;
+

@@ -19,8 +19,8 @@ public class UpdateCustomerCommandHandler : IRequestHandler<UpdateCustomerComman
     public async Task Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
         var customer = await _customerQueryRepository.GetByIdAsync(request.Id);
-        if (customer == null)
-            throw new InvalidOperationException("Customer not found.");
+
+        if (customer == null) throw new InvalidOperationException("Customer not found.");
 
         customer.Update(
             request.StoreName,

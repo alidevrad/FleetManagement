@@ -16,6 +16,8 @@ public class CustomersController : ControllerBase
         _mediator = mediator;
     }
 
+    #region Customer
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command)
     {
@@ -40,11 +42,45 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{customerId}/add-phone-number")]
+    public async Task<IActionResult> AddPhoneNumber(long customerId, [FromBody] AddPhoneNumberCommand command)
+    {
+        if (customerId != command.CustomerId)
+            return BadRequest("Mismatched customer ID");
+
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpPost("{customerId}/remove-phone-number")]
+    public async Task<IActionResult> RemovePhoneNumber(long customerId, [FromBody] RemovePhoneNumberCommand command)
+    {
+        if (customerId != command.CustomerId)
+            return BadRequest("Mismatched customer ID");
+
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    #endregion
+
+    #region Branch
+
     [HttpPost("{customerId}/add-branch")]
     public async Task<IActionResult> AddBranch(long customerId, [FromBody] AddBranchCommand command)
     {
         if (customerId != command.CustomerId)
             return BadRequest("Mismatched customer ID");
+
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpPut("{customerId}/update-branch/{branchId}")]
+    public async Task<IActionResult> UpdateBranch(long customerId, long branchId, [FromBody] UpdateBranchCommand command)
+    {
+        if (customerId != command.CustomerId || branchId != command.BranchId)
+            return BadRequest("Mismatched customer or branch ID");
 
         await _mediator.Send(command);
         return NoContent();
@@ -71,23 +107,6 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{customerId}/add-phone-number")]
-    public async Task<IActionResult> AddPhoneNumber(long customerId, [FromBody] AddPhoneNumberCommand command)
-    {
-        if (customerId != command.CustomerId)
-            return BadRequest("Mismatched customer ID");
+    #endregion
 
-        await _mediator.Send(command);
-        return NoContent();
-    }
-
-    [HttpPost("{customerId}/remove-phone-number")]
-    public async Task<IActionResult> RemovePhoneNumber(long customerId, [FromBody] RemovePhoneNumberCommand command)
-    {
-        if (customerId != command.CustomerId)
-            return BadRequest("Mismatched customer ID");
-
-        await _mediator.Send(command);
-        return NoContent();
-    }
 }

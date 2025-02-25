@@ -64,6 +64,16 @@ public class VehiclesController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{vehicleId}/update-maintenance/{maintenanceId}")]
+    public async Task<IActionResult> UpdateBranch(long vehicleId, long maintenanceId, [FromBody] UpdateVehicleMaintenanceCommand command)
+    {
+        if (vehicleId != command.Id || maintenanceId != command.VehicleMaintenanceId)
+            return BadRequest("Mismatched vehicle or maintenance ID");
+
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     #region Next phase
 
     //TODO: Next phase

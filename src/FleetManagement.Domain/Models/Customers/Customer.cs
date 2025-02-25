@@ -11,15 +11,9 @@ public class Customer : AuditableAggregateRoot<long>
     public string StoreName { get; private set; }
     public string StoreOwnerName { get; private set; }
     public string TaxNumber { get; private set; }
-
-    //TODO: Should be optional
     public double Latitude { get; private set; }
-
-    //TODO: Should be optional
     public double Longitude { get; private set; }
-
     public string Email { get; private set; }
-
 
     private readonly List<Branch> _branches = new();
     public IReadOnlyList<Branch> Branches => _branches.AsReadOnly();

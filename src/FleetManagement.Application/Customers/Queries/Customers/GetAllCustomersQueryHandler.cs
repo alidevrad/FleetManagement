@@ -3,7 +3,7 @@ using FleetManagement.Domain.Models.Customers;
 using FleetManagement.Domain.Models.Customers.Repositories;
 using MediatR;
 
-namespace FleetManagement.Application.Customers.Queries;
+namespace FleetManagement.Application.Customers.Queries.Customers;
 
 public class GetAllCustomersQueryHandler : IRequestHandler<GetAllCustomersQuery, List<Customer>>
 {

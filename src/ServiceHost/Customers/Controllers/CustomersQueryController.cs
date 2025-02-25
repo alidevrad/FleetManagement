@@ -9,10 +9,10 @@ namespace ServiceHost.Customers.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CustomersQueryControllerController : ControllerBase
+public class CustomersQueryController : ControllerBase
 {
     private readonly IMediator _mediator;
-    public CustomersQueryControllerController(IMediator mediator)
+    public CustomersQueryController(IMediator mediator)
     {
         this._mediator = mediator;
     }
@@ -29,5 +29,19 @@ public class CustomersQueryControllerController : ControllerBase
     {
         var customers = await _mediator.Send(new GetAllCustomersQuery());
         return Ok(customers);
+    }
+
+    [HttpGet("{id:long}/branches")]
+    public async Task<ActionResult<List<Branch>>> GetBranchesByCustomerId(long id)
+    {
+        var branches = await _mediator.Send(new GetCustomerBranchesQuery(id));
+        return branches != null && branches.Count > 0 ? Ok(branches) : NotFound();
+    }
+
+    [HttpGet("{customerId:long}/branches/{branchId:long}")]
+    public async Task<ActionResult<Branch>> GetSpecificBranchOfCustomer(long customerId, long branchId)
+    {
+        var branch = await _mediator.Send(new GetSpecificBranchOfCustomerQuery(customerId, branchId));
+        return branch != null ? Ok(branch) : NotFound();
     }
 }

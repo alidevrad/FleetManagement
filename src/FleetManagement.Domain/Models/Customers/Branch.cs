@@ -89,7 +89,21 @@ public class Branch : AuditableEntity<long>
         _phoneNumbers.Remove(phone);
     }
 
-    public void ChangeAddress(string newAddress) => Address = newAddress;
+    public void Update(
+                   string name,
+                   double latitude,
+                   double longitude,
+                   string address,
+                   string agentFullName,
+                   PhoneNumber agentPhoneNumber)
+    {
+        Name = name;
+        Latitude = latitude;
+        Longitude = longitude;
+        Address = address;
+        AgentFullName = agentFullName;
+        AgentPhoneNumber = agentPhoneNumber;
+    }
 
     #endregion
 }

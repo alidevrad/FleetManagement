@@ -16,4 +16,9 @@ public class VehicleMaintenance : AuditableEntity<long>
         Reason = reason;
         RepairDate = repairDate;
     }
+
+    public void Update(string reason)
+    {
+        Reason = reason;
+    }
 }

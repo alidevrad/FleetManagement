@@ -4,6 +4,9 @@ namespace FleetManagement.Domain.Models.Vehicles.Repositories;
 
 public interface IVehicleQueryRepository : IQueryRepository<long, Vehicle>
 {
+    Task<List<VehicleMaintenance>> GetVehicleMaintenancesByVehicleId(long vehicleId);
+
+    Task<VehicleMaintenance> GetSpecificVehicleMaintenanceOfVehicle(long vehicleId, long vehicleMaintenanceId);
 }
 
 //TODO: Next phase
